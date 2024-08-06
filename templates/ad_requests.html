@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Requests</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('sponsor_dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('create_campaign') }}">Create Campaign</a></li>
+            <li><a href="{{ url_for('ad_requests') }}">Ad Requests</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Ad Requests</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Campaign Name</th>
+                    <th>Influencer</th>
+                    <th>Messages</th>
+                    <th>Requirements</th>
+                    <th>Payment Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ad_request in ad_requests %}
+                <tr>
+                    <td>{{ ad_request.id }}</td>
+                    <td>{{ ad_request.campaign.name }}</td>
+                    <td>{{ ad_request.influencer.username }}</td>
+                    <td>{{ ad_request.messages }}</td>
+                    <td>{{ ad_request.requirements }}</td>
+                    <td>{{ ad_request.payment_amount }}</td>
+                    <td>{{ ad_request.status }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_ad_request', id=ad_request.id) }}">Edit</a> |
+                        <form action="{{ url_for('delete_ad_request', id=ad_request.id) }}" method="POST" style="display:inline;">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

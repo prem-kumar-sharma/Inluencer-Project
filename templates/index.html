@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Welcome to the Influencer Platform</h1>
+<p>This is the home page.</p>
+{% if session.get('username') %}
+    <p>Hello, {{ session['username'] }}! You are logged in as {{ session['role'] }}.</p>
+{% endif %}
+{% endblock %}

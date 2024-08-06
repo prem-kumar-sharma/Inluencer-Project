@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header text-center">
+    <h1>Admin Dashboard</h1>
+    <p>Welcome, Admin</p>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Manage Users</h5>
+                <p class="card-text">View and manage all users.</p>
+                <a href="#" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Analytics</h5>
+                <p class="card-text">View site analytics.</p>
+                <a href="#" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Settings</h5>
+                <p class="card-text">Adjust site settings.</p>
+                <a href="#" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

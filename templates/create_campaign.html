@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Campaign</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('sponsor_dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('create_campaign') }}">Create Campaign</a></li>
+            <li><a href="{{ url_for('ad_requests') }}">Ad Requests</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Create Campaign</h1>
+        <form method="POST">
+            <label for="name">Campaign Name:</label>
+            <input type="text" id="name" name="name" required><br>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required></textarea><br>
+
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date"><br>
+
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date"><br>
+
+            <label for="budget">Budget:</label>
+            <input type="number" id="budget" name="budget" step="0.01" required><br>
+
+            <label for="visibility">Visibility:</label>
+            <select id="visibility" name="visibility">
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+            </select><br>
+
+            <button type="submit">Create</button>
+        </form>
+    </div>
+</body>
+</html>

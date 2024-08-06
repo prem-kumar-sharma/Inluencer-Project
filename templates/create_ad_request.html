@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Ad Request</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('sponsor_dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('create_campaign') }}">Create Campaign</a></li>
+            <li><a href="{{ url_for('ad_requests') }}">Ad Requests</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Create Ad Request for {{ campaign.name }}</h1>
+        <form method="POST">
+            <label for="influencer_id">Influencer ID:</label>
+            <input type="number" id="influencer_id" name="influencer_id" required><br>
+
+            <label for="messages">Messages:</label>
+            <textarea id="messages" name="messages" required></textarea><br>
+
+            <label for="requirements">Requirements:</label>
+            <textarea id="requirements" name="requirements" required></textarea><br>
+
+            <label for="payment_amount">Payment Amount:</label>
+            <input type="number" id="payment_amount" name="payment_amount" step="0.01" required><br>
+
+            <button type="submit">Create</button>
+        </form>
+    </div>
+</body>
+</html>
