@@ -18,32 +18,36 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('index') }}">Home</a>
                 </li>
-                {% if session.get('role') == 'Admin' %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
-                </li>
-                {% elif session.get('role') == 'Sponsor' %}
+                {% if session.get('role') == 'Sponsor' %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('sponsor_dashboard') }}">Sponsor Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('create_campaign') }}">Create Campaign</a>
+                    <a class="nav-link" href="{{ url_for('my_campaigns') }}">My Campaigns</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('influencer_collaboration') }}">Influencer Collaboration</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('analytics') }}">Analytics</a>
                 </li>
                 {% elif session.get('role') == 'Influencer' %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('influencer_dashboard') }}">Influencer Dashboard</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('influencer_ad_requests') }}">Ad Requests</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('profile_settings') }}">Profile Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('influencer_analytics') }}">Analytics</a>
+                </li>
                 {% endif %}
                 {% if session.get('username') %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('register') }}">Register</a>
                 </li>
                 {% endif %}
             </ul>

@@ -1,35 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Respond to Ad Request</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <nav>
-        <ul>
-            <li><a href="{{ url_for('index') }}">Home</a></li>
-            <li><a href="{{ url_for('influencer_dashboard') }}">Dashboard</a></li>
-            <li><a href="{{ url_for('influencer_ad_requests') }}">Ad Requests</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-        </ul>
-    </nav>
-    <div class="container">
-        <h1>Respond to Ad Request for {{ ad_request.campaign.name }}</h1>
-        <form method="POST">
-            <label for="payment_amount">Payment Amount:</label>
-            <input type="number" id="payment_amount" name="payment_amount" step="0.01" value="{{ ad_request.payment_amount }}" required><br>
+{% extends 'base.html' %}
 
-            <label for="status">Status:</label>
-            <select id="status" name="status">
-                <option value="Pending" {% if ad_request.status == 'Pending' %}selected{% endif %}>Pending</option>
-                <option value="Accepted" {% if ad_request.status == 'Accepted' %}selected{% endif %}>Accepted</option>
-                <option value="Rejected" {% if ad_request.status == 'Rejected' %}selected{% endif %}>Rejected</option>
-            </select><br>
+{% block title %}Respond to Ad Request{% endblock %}
 
-            <button type="submit">Respond</button>
-        </form>
-    </div>
-</body>
-</html>
+{% block content %}
+<div class="container">
+    <h1>Respond to Ad Request for {{ ad_request.campaign.name }}</h1>
+    <form method="POST">
+        <label for="payment_amount">Payment Amount:</label>
+        <input type="number" id="payment_amount" name="payment_amount" step="0.01" value="{{ ad_request.payment_amount }}" required><br>
+
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Pending" {% if ad_request.status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Accepted" {% if ad_request.status == 'Accepted' %}selected{% endif %}>Accepted</option>
+            <option value="Rejected" {% if ad_request.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+        </select><br>
+
+        <button type="submit" class="btn btn-primary">Respond</button>
+    </form>
+</div>
+{% endblock %}

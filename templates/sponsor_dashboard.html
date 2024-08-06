@@ -13,7 +13,7 @@
             <div class="card-body">
                 <h5 class="card-title">My Campaigns</h5>
                 <p class="card-text">View and manage your campaigns.</p>
-                <a href="#" class="btn btn-primary">Go</a>
+                <a href="{{ url_for('my_campaigns') }}" class="btn btn-primary">Go</a>
             </div>
         </div>
     </div>
@@ -22,7 +22,7 @@
             <div class="card-body">
                 <h5 class="card-title">Influencer Collaboration</h5>
                 <p class="card-text">View and manage your influencer collaborations.</p>
-                <a href="#" class="btn btn-primary">Go</a>
+                <a href="{{ url_for('influencer_collaboration') }}" class="btn btn-primary">Go</a>
             </div>
         </div>
     </div>
@@ -31,7 +31,7 @@
             <div class="card-body">
                 <h5 class="card-title">Analytics</h5>
                 <p class="card-text">View campaign analytics.</p>
-                <a href="#" class="btn btn-primary">Go</a>
+                <a href="{{ url_for('analytics') }}" class="btn btn-primary">Go</a>
             </div>
         </div>
     </div>

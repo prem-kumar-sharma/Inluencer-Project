@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'  # Change this to a secure value
@@ -87,10 +88,14 @@ def create_campaign():
         if request.method == 'POST':
             name = request.form['name']
             description = request.form['description']
-            start_date = request.form['start_date']
-            end_date = request.form['end_date']
+            start_date_str = request.form['start_date']
+            end_date_str = request.form['end_date']
             budget = float(request.form['budget'])
             visibility = True if request.form.get('visibility') == 'public' else False
+
+            # Convert string dates to Python date objects
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date() if start_date_str else None
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
 
             sponsor_id = session['user_id']
             campaign = Campaign(name=name, description=description, start_date=start_date,
@@ -114,8 +119,10 @@ def edit_campaign(id):
         if request.method == 'POST':
             campaign.name = request.form['name']
             campaign.description = request.form['description']
-            campaign.start_date = request.form['start_date']
-            campaign.end_date = request.form['end_date']
+            start_date_str = request.form['start_date']
+            end_date_str = request.form['end_date']
+            campaign.start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date() if start_date_str else None
+            campaign.end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
             campaign.budget = float(request.form['budget'])
             campaign.visibility = True if request.form.get('visibility') == 'public' else False
 
@@ -210,6 +217,40 @@ def delete_ad_request(id):
     else:
         flash('Unauthorized access. Please log in as Sponsor.', 'danger')
         return redirect(url_for('login'))
+    
+#my_campaigns
+    
+@app.route('/sponsor/my_campaigns')
+def my_campaigns():
+    if 'username' in session and session['role'] == 'Sponsor':
+        sponsor_id = session['user_id']
+        campaigns = Campaign.query.filter_by(sponsor_id=sponsor_id).all()
+        return render_template('my_campaigns.html', campaigns=campaigns)
+    else:
+        flash('Unauthorized access. Please log in as Sponsor.', 'danger')
+        return redirect(url_for('login'))
+
+#influencer_collaboration
+
+@app.route('/sponsor/influencer_collaboration')
+def influencer_collaboration():
+    if 'username' in session and session['role'] == 'Sponsor':
+        sponsor_id = session['user_id']
+        ad_requests = AdRequest.query.join(Campaign).filter(Campaign.sponsor_id == sponsor_id).all()
+        return render_template('influencer_collaboration.html', ad_requests=ad_requests)
+    else:
+        flash('Unauthorized access. Please log in as Sponsor.', 'danger')
+        return redirect(url_for('login'))
+    
+#analytics   
+@app.route('/sponsor/analytics')
+def analytics():
+    if 'username' in session and session['role'] == 'Sponsor':
+        # Placeholder for actual analytics data
+        return render_template('analytics.html')
+    else:
+        flash('Unauthorized access. Please log in as Sponsor.', 'danger')
+        return redirect(url_for('login'))
 
 # Influencer Routes
 @app.route('/influencer/dashboard')
@@ -227,7 +268,6 @@ def influencer_ad_requests():
     if 'username' in session and session['role'] == 'Influencer':
         influencer_id = session['user_id']
         ad_requests = AdRequest.query.filter_by(influencer_id=influencer_id).all()
-
         return render_template('influencer_ad_requests.html', ad_requests=ad_requests)
     else:
         flash('Unauthorized access. Please log in as Influencer.', 'danger')
@@ -250,6 +290,25 @@ def respond_ad_request(id):
     else:
         flash('Unauthorized access. Please log in as Influencer.', 'danger')
         return redirect(url_for('login'))
+    
+@app.route('/influencer/profile_settings')
+def profile_settings():
+    if 'username' in session and session['role'] == 'Influencer':
+        # Implement profile settings functionality here
+        return render_template('profile_settings.html')
+    else:
+        flash('Unauthorized access. Please log in as Influencer.', 'danger')
+        return redirect(url_for('login'))
+    
+@app.route('/influencer/analytics')
+def influencer_analytics():
+    if 'username' in session and session['role'] == 'Influencer':
+        # Placeholder for actual analytics data
+        return render_template('influencer_analytics.html')
+    else:
+        flash('Unauthorized access. Please log in as Influencer.', 'danger')
+        return redirect(url_for('login'))
+
 
 # Authentication Routes
 @app.route('/login', methods=['GET', 'POST'])
