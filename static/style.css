@@ -65,3 +65,28 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: #007bff !important;
+}
+
+.jumbotron {
+    background-color: #f8f9fa;
+    padding: 2rem 1rem;
+}
+
+.jumbotron .btn {
+    margin: 0.5rem;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
