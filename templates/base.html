@@ -18,7 +18,29 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('index') }}">Home</a>
                 </li>
-                {% if session.get('role') == 'Sponsor' %}
+                {% if session.get('role') == 'Admin' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('manage_users') }}">Manage Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('manage_campaigns') }}">Manage Campaigns</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('manage_ad_requests') }}">Manage Ad Requests</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_analytics') }}">Analytics</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('manage_flagged_users') }}">Flagged Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_settings') }}">Settings</a>
+                </li>
+                {% elif session.get('role') == 'Sponsor' %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('sponsor_dashboard') }}">Sponsor Dashboard</a>
                 </li>
@@ -30,6 +52,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('analytics') }}">Analytics</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('search_influencers') }}">Search Influencers</a>
                 </li>
                 {% elif session.get('role') == 'Influencer' %}
                 <li class="nav-item">
@@ -43,6 +68,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('influencer_analytics') }}">Analytics</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('search_campaigns') }}">Search Campaigns</a>
                 </li>
                 {% endif %}
                 {% if session.get('username') %}

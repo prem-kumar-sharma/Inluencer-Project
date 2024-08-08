@@ -17,9 +17,14 @@ class User(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(50), nullable=False)  # Admin, Sponsor, Influencer
+    niche = db.Column(db.String(100))  # Niche for influencers
+    reach = db.Column(db.Integer)  # Reach for influencers
+    flagged = db.Column(db.Boolean, default=False)  # Flagged status
 
     def __repr__(self):
         return f'<User {self.username}>'
+
+
 
 class Campaign(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -31,9 +36,11 @@ class Campaign(db.Model):
     visibility = db.Column(db.Boolean)  # Public or Private
     sponsor_id = db.Column(db.Integer, ForeignKey('user.id'))
     sponsor = relationship('User', foreign_keys=[sponsor_id])
+    niche = db.Column(db.String(100))  # New field for categorization
 
     def __repr__(self):
         return f'<Campaign {self.name}>'
+
 
 class AdRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -62,7 +69,7 @@ def admin_dashboard():
         users_count = User.query.count()
         campaigns_count = Campaign.query.count()
         ad_requests_count = AdRequest.query.count()
-        flagged_users_count = 0  # Implement logic for flagged users
+        flagged_users_count = User.query.filter_by(flagged=True).count()
 
         return render_template('admin_dashboard.html', users_count=users_count,
                                campaigns_count=campaigns_count, ad_requests_count=ad_requests_count,
@@ -70,6 +77,153 @@ def admin_dashboard():
     else:
         flash('Unauthorized access. Please log in as Admin.', 'danger')
         return redirect(url_for('login'))
+
+@app.route('/admin/manage_users')
+def manage_users():
+    if 'username' in session and session['role'] == 'Admin':
+        users = User.query.all()
+        return render_template('manage_users.html', users=users)
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+
+@app.route('/admin/manage_campaigns')
+def manage_campaigns():
+    if 'username' in session and session['role'] == 'Admin':
+        campaigns = Campaign.query.all()
+        return render_template('manage_campaigns.html', campaigns=campaigns)
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+
+@app.route('/admin/manage_ad_requests')
+def manage_ad_requests():
+    if 'username' in session and session['role'] == 'Admin':
+        ad_requests = AdRequest.query.all()
+        return render_template('manage_ad_requests.html', ad_requests=ad_requests)
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+
+@app.route('/admin/analytics')
+def admin_analytics():
+    if 'username' in session and session['role'] == 'Admin':
+        return render_template('analytics.html')
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+
+@app.route('/admin/manage_flagged_users')
+def manage_flagged_users():
+    if 'username' in session and session['role'] == 'Admin':
+        flagged_users = User.query.filter_by(flagged=True).all()
+        return render_template('manage_flagged_users.html', flagged_users=flagged_users)
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+    
+
+
+
+@app.route('/admin/settings')
+def admin_settings():
+    if 'username' in session and session['role'] == 'Admin':
+        return render_template('settings.html')
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+
+# Route to edit a user
+@app.route('/admin/edit_user/<int:id>', methods=['GET', 'POST'])
+def edit_user(id):
+    if 'username' in session and session['role'] == 'Admin':
+        user = User.query.get_or_404(id)
+        if request.method == 'POST':
+            user.username = request.form['username']
+            user.password = request.form['password']
+            user.role = request.form['role']
+            db.session.commit()
+            flash('User updated successfully!', 'success')
+            return redirect(url_for('manage_users'))
+        return render_template('edit_user.html', user=user)
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+
+# Route to delete a user
+@app.route('/admin/delete_user/<int:id>', methods=['POST'])
+def delete_user(id):
+    if 'username' in session and session['role'] == 'Admin':
+        user = User.query.get_or_404(id)
+        db.session.delete(user)
+        db.session.commit()
+        flash('User deleted successfully!', 'success')
+        return redirect(url_for('manage_users'))
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+    
+# Edit Campaign route for Admin
+@app.route('/admin/edit_campaign/<int:id>', methods=['GET', 'POST'])
+def admin_edit_campaign(id):
+    if 'username' in session and session['role'] == 'Admin':
+        campaign = Campaign.query.get_or_404(id)
+        if request.method == 'POST':
+            campaign.name = request.form['name']
+            campaign.description = request.form['description']
+            start_date_str = request.form['start_date']
+            end_date_str = request.form['end_date']
+            campaign.start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date() if start_date_str else None
+            campaign.end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
+            campaign.budget = float(request.form['budget'])
+            campaign.visibility = True if request.form.get('visibility') == 'public' else False
+            campaign.niche = request.form['niche']
+            db.session.commit()
+            flash('Campaign updated successfully!', 'success')
+            return redirect(url_for('manage_campaigns'))
+        return render_template('edit_campaign.html', campaign=campaign)
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+
+# Delete Campaign route for Admin
+@app.route('/admin/delete_campaign/<int:id>', methods=['POST'])
+def admin_delete_campaign(id):
+    if 'username' in session and session['role'] == 'Admin':
+        campaign = Campaign.query.get_or_404(id)
+        db.session.delete(campaign)
+        db.session.commit()
+        flash('Campaign deleted successfully!', 'success')
+        return redirect(url_for('manage_campaigns'))
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+
+# Route to flag & unflag a user
+@app.route('/admin/flag_user/<int:id>', methods=['POST'])
+def flag_user(id):
+    if 'username' in session and session['role'] == 'Admin':
+        user = User.query.get_or_404(id)
+        user.flagged = True
+        db.session.commit()
+        flash(f'User {user.username} flagged successfully!', 'warning')
+        return redirect(url_for('manage_users'))
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+
+@app.route('/admin/unflag_user/<int:id>', methods=['POST'])
+def unflag_user(id):
+    if 'username' in session and session['role'] == 'Admin':
+        user = User.query.get_or_404(id)
+        user.flagged = False
+        db.session.commit()
+        flash(f'User {user.username} unflagged successfully!', 'success')
+        return redirect(url_for('manage_users'))
+    else:
+        flash('Unauthorized access. Please log in as Admin.', 'danger')
+        return redirect(url_for('login'))
+
 
 # Sponsor Routes
 @app.route('/sponsor/dashboard')
@@ -92,14 +246,14 @@ def create_campaign():
             end_date_str = request.form['end_date']
             budget = float(request.form['budget'])
             visibility = True if request.form.get('visibility') == 'public' else False
+            niche = request.form['niche']
 
-            # Convert string dates to Python date objects
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date() if start_date_str else None
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
 
             sponsor_id = session['user_id']
             campaign = Campaign(name=name, description=description, start_date=start_date,
-                                end_date=end_date, budget=budget, visibility=visibility, sponsor_id=sponsor_id)
+                                end_date=end_date, budget=budget, visibility=visibility, sponsor_id=sponsor_id, niche=niche)
 
             db.session.add(campaign)
             db.session.commit()
@@ -125,6 +279,7 @@ def edit_campaign(id):
             campaign.end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
             campaign.budget = float(request.form['budget'])
             campaign.visibility = True if request.form.get('visibility') == 'public' else False
+            campaign.niche = request.form['niche']
 
             db.session.commit()
             flash('Campaign updated successfully!', 'success')
@@ -158,7 +313,7 @@ def ad_requests():
     else:
         flash('Unauthorized access. Please log in as Sponsor.', 'danger')
         return redirect(url_for('login'))
-
+    
 @app.route('/sponsor/create_ad_request/<int:campaign_id>', methods=['GET', 'POST'])
 def create_ad_request(campaign_id):
     if 'username' in session and session['role'] == 'Sponsor':
@@ -169,7 +324,7 @@ def create_ad_request(campaign_id):
             messages = request.form['messages']
             requirements = request.form['requirements']
             payment_amount = float(request.form['payment_amount'])
-            status = 'Pending'  # Initial status
+            status = 'Pending'
 
             ad_request = AdRequest(campaign_id=campaign_id, influencer_id=influencer_id,
                                    messages=messages, requirements=requirements,
@@ -185,12 +340,14 @@ def create_ad_request(campaign_id):
         flash('Unauthorized access. Please log in as Sponsor.', 'danger')
         return redirect(url_for('login'))
 
+
 @app.route('/sponsor/edit_ad_request/<int:id>', methods=['GET', 'POST'])
 def edit_ad_request(id):
     if 'username' in session and session['role'] == 'Sponsor':
         ad_request = AdRequest.query.get_or_404(id)
 
         if request.method == 'POST':
+            ad_request.campaign_id = request.form['campaign_id']
             ad_request.influencer_id = request.form['influencer_id']
             ad_request.messages = request.form['messages']
             ad_request.requirements = request.form['requirements']
@@ -201,7 +358,9 @@ def edit_ad_request(id):
             flash('Ad request updated successfully!', 'success')
             return redirect(url_for('ad_requests'))
 
-        return render_template('edit_ad_request.html', ad_request=ad_request)
+        campaigns = Campaign.query.filter_by(sponsor_id=session['user_id']).all()
+        influencers = User.query.filter_by(role='Influencer').all()
+        return render_template('edit_ad_request.html', ad_request=ad_request, campaigns=campaigns, influencers=influencers)
     else:
         flash('Unauthorized access. Please log in as Sponsor.', 'danger')
         return redirect(url_for('login'))
@@ -217,9 +376,44 @@ def delete_ad_request(id):
     else:
         flash('Unauthorized access. Please log in as Sponsor.', 'danger')
         return redirect(url_for('login'))
-    
-#my_campaigns
-    
+
+
+@app.route('/sponsor/search_influencers', methods=['GET', 'POST'])
+def search_influencers():
+    if 'username' in session and session['role'] == 'Sponsor':
+        influencers = []
+        if request.method == 'POST':
+            username = request.form.get('username')
+            niche = request.form.get('niche')
+            query = User.query.filter(User.role == 'Influencer')
+
+            if username:
+                query = query.filter(User.username.ilike(f'%{username}%'))
+            if niche:
+                query = query.filter(User.niche.ilike(f'%{niche}%'))
+
+            influencers = query.all()
+
+        return render_template('search_influencers.html', influencers=influencers)
+    else:
+        flash('Unauthorized access. Please log in as Sponsor.', 'danger')
+        return redirect(url_for('login'))
+
+
+
+@app.route('/influencer/search_campaigns', methods=['GET', 'POST'])
+def search_campaigns():
+    if 'username' in session and session['role'] == 'Influencer':
+        if request.method == 'POST':
+            niche = request.form['niche']
+            campaigns = Campaign.query.filter(Campaign.visibility == True, 
+                                              Campaign.niche.ilike(f'%{niche}%')).all()
+            return render_template('search_campaigns.html', campaigns=campaigns)
+        return render_template('search_campaigns.html')
+    else:
+        flash('Unauthorized access. Please log in as Influencer.', 'danger')
+        return redirect(url_for('login'))
+
 @app.route('/sponsor/my_campaigns')
 def my_campaigns():
     if 'username' in session and session['role'] == 'Sponsor':
@@ -230,8 +424,6 @@ def my_campaigns():
         flash('Unauthorized access. Please log in as Sponsor.', 'danger')
         return redirect(url_for('login'))
 
-#influencer_collaboration
-
 @app.route('/sponsor/influencer_collaboration')
 def influencer_collaboration():
     if 'username' in session and session['role'] == 'Sponsor':
@@ -241,13 +433,44 @@ def influencer_collaboration():
     else:
         flash('Unauthorized access. Please log in as Sponsor.', 'danger')
         return redirect(url_for('login'))
-    
-#analytics   
+
 @app.route('/sponsor/analytics')
 def analytics():
     if 'username' in session and session['role'] == 'Sponsor':
-        # Placeholder for actual analytics data
         return render_template('analytics.html')
+    else:
+        flash('Unauthorized access. Please log in as Sponsor.', 'danger')
+        return redirect(url_for('login'))
+
+@app.route('/sponsor/send_ad_request', methods=['GET', 'POST'])
+def send_ad_request():
+    if 'username' in session and session['role'] == 'Sponsor':
+        campaigns = Campaign.query.filter_by(sponsor_id=session['user_id']).all()
+        influencers = User.query.filter_by(role='Influencer').all()
+        
+        if request.method == 'POST':
+            campaign_id = request.form['campaign_id']
+            influencer_id = request.form['influencer_id']
+            messages = request.form['messages']
+            requirements = request.form['requirements']
+            payment_amount = float(request.form['payment_amount'])
+            status = 'Pending'
+
+            ad_request = AdRequest(
+                campaign_id=campaign_id,
+                influencer_id=influencer_id,
+                messages=messages,
+                requirements=requirements,
+                payment_amount=payment_amount,
+                status=status
+            )
+
+            db.session.add(ad_request)
+            db.session.commit()
+            flash('Ad request sent successfully!', 'success')
+            return redirect(url_for('ad_requests'))
+
+        return render_template('send_ad_request.html', campaigns=campaigns, influencers=influencers)
     else:
         flash('Unauthorized access. Please log in as Sponsor.', 'danger')
         return redirect(url_for('login'))
@@ -290,26 +513,35 @@ def respond_ad_request(id):
     else:
         flash('Unauthorized access. Please log in as Influencer.', 'danger')
         return redirect(url_for('login'))
-    
-@app.route('/influencer/profile_settings')
+
+@app.route('/influencer/profile_settings', methods=['GET', 'POST'])
 def profile_settings():
     if 'username' in session and session['role'] == 'Influencer':
-        # Implement profile settings functionality here
-        return render_template('profile_settings.html')
+        influencer_id = session['user_id']
+        user = User.query.get_or_404(influencer_id)
+
+        if request.method == 'POST':
+            user.username = request.form['username']
+            user.password = request.form['password']
+            user.niche = request.form['niche']
+            user.reach = request.form['reach']
+            db.session.commit()
+            flash('Profile updated successfully!', 'success')
+            return redirect(url_for('influencer_dashboard'))
+
+        return render_template('profile_settings.html', user=user)
     else:
         flash('Unauthorized access. Please log in as Influencer.', 'danger')
         return redirect(url_for('login'))
-    
+
 @app.route('/influencer/analytics')
 def influencer_analytics():
     if 'username' in session and session['role'] == 'Influencer':
-        # Placeholder for actual analytics data
         return render_template('influencer_analytics.html')
     else:
         flash('Unauthorized access. Please log in as Influencer.', 'danger')
         return redirect(url_for('login'))
-
-
+    
 # Authentication Routes
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -359,10 +591,6 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
-# Error Handling
-# @app.errorhandler(404)
-# def page_not_found(e):
-#     return render_template('404.html'), 404
 
 if __name__ == '__main__':
     with app.app_context():
