@@ -152,7 +152,7 @@ project/
 ## Screenshots
 
 ### Admin Dashboard
-![image](https://github.com/user-attachments/assets/f40e08c3-0bb7-4ed5-a7e7-0469da40e3b9)
+
 
 
 ### Sponsor Dashboard
