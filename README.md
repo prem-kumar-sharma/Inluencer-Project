@@ -152,7 +152,8 @@ project/
 ## Screenshots
 
 ### Admin Dashboard
-*Coming Soon*
+![image](https://github.com/user-attachments/assets/f40e08c3-0bb7-4ed5-a7e7-0469da40e3b9)
+
 
 ### Sponsor Dashboard
 ![image](https://github.com/user-attachments/assets/a45fe53c-7fbc-42db-9a21-3a61cd729b31)
