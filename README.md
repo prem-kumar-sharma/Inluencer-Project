@@ -170,16 +170,9 @@ Contributions are welcome! Please follow these steps:
 2. Create a feature branch.
 3. Commit your changes.
 4. Create a pull request.
-
----
-
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.
-
 ---
 
 ## Contact
 For any inquiries or feedback, please reach out to:
-- **Email**: your-email@example.com
-- **GitHub**: [your-username](https://github.com/your-username)
-
+- **Email**: 21f1000531@ds.study.iitm.ac.in
+-
